@@ -1,0 +1,2 @@
+# NITIW401-IoT-WEB-APPLICATION-DEVELOPMENT-USING-PHP
+ This specific module describes the skills, knowledge and attitude required to develop an IoT web application. This module is intended to prepare student pursuing TVET Level 4 in Networking and Internet Technologies. Upon completion of this module, the learner will be able to develop an API using PHP, develop User Interface, Integrate API Endpoints with User Interface, develop a web application and document an IoT web application using PHP.
