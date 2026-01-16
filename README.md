@@ -4,12 +4,10 @@ Welcome! This guide is designed for beginners to learn **Module NITIW401** alone
 
 **Prerequisites:**
 
-1. 
-**XAMPP/WAMP:** To run the server and database.
+1. **XAMPP/WAMP:** To run the server and database.
 
 
-2. 
-**Postman:** To test if your code works.
+2. **Postman:** To test if your code works.
 
 
 
@@ -21,8 +19,7 @@ Welcome! This guide is designed for beginners to learn **Module NITIW401** alone
 
 <img width="420" height="auto" alt="image" src="https://github.com/user-attachments/assets/ce6eb905-20cb-4858-a54f-9101a1bb8924" />
 
-* 
-**Endpoint:** A specific URL (link) where the API listens for orders, like `http://localhost/api/create.php`.
+* **Endpoint:** A specific URL (link) where the API listens for orders, like `http://localhost/api/create.php`.
 
 
 * **JSON:** The language they speak. It is lightweight and easy for machines to read.
@@ -274,8 +271,7 @@ $conn->close();
 
 To keep your application safe, always remember these three rules:
 
-1. 
-**Use HTTPS:** Encrypts data so no one can steal passwords.
+1. **Use HTTPS:** Encrypts data so no one can steal passwords.
 
 
 2. **Input Validation:** Never trust what the user sends. Always check if the data exists before using it (like we did in `create.php`).
@@ -314,14 +310,11 @@ You don't need a real sensor yet! Use **Postman** to pretend to be a device.
 
 ## 📝 Practice Challenges for Students
 
-1. 
-**Modify `read.php`:** Change the SQL query to only show sensors where `temperature > 30` 
+1. **Modify `read.php`:** Change the SQL query to only show sensors where `temperature > 30` 
 (Hint: Use `WHERE` clause).
 
 
-2. 
-**Secure the Delete:** Add an `if` check in `delete.php` to make sure the `$id` is not empty before running the query.
+2. **Secure the Delete:** Add an `if` check in `delete.php` to make sure the `$id` is not empty before running the query.
 
 
-3. 
-**Authentication:** Create a simple check so that you only allow requests if they send a specific "API Key" in the JSON?.
+3. **Authentication:** Create a simple check so that you only allow requests if they send a specific "API Key" in the JSON?.
