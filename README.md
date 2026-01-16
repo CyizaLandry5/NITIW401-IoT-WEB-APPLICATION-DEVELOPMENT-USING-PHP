@@ -308,7 +308,7 @@ You don't need a real sensor yet! Use **Postman** to pretend to be a device.
 
 ---
 
-## 📝 Practice Challenges for Students
+## 📝 Practice Challenges 
 
 1. **Modify `read.php`:** Change the SQL query to only show sensors where `temperature > 30` 
 (Hint: Use `WHERE` clause).
