@@ -24,7 +24,9 @@ Welcome! This guide is designed for beginners to learn **Module NITIW401** alone
 
 
 * **JSON:** The language they speak. It is lightweight and easy for machines to read.
-
+* 
+**Definition:** JSON (JavaScript Object Notation) is a lightweight, text-based, and human-readable format for storing and exchanging data, consisting primarily of key-value pairs. 
+**Role in PHP IoT Web App:** It acts as the standard, lightweight language for transmitting sensor data between IoT devices (via MQTT or HTTP) and the PHP web backend, which parses it using json_encode() and json_decode() to display or store information. 
 
 * *Example:* `{"sensor_id": "S1", "temp": 25.5}`
 
