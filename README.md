@@ -16,6 +16,7 @@ Welcome! This guide is designed for beginners to learn **Module NITIW401** alone
 ## 📚 1. The Theory
 
 * **API (Application Programming Interface):** Think of this as a "Waiter." The IoT device (Customer) orders food, the API (Waiter) tells the Kitchen (Database), and then brings the food back.
+* ** In IOT Web App Development, API is a set of rules, protocols, and tools that allows connected devices (sensors, actuators) to communicate with a PHP backend server, exchange data, and receive commands. It acts as a middleman that ensures data is exchanged in a standardized format, usually JSON or XML, between IoT devices and the web application. 
 
 <img width="420" height="auto" alt="image" src="https://github.com/user-attachments/assets/ce6eb905-20cb-4858-a54f-9101a1bb8924" />
 
