@@ -1,3 +1,86 @@
+
+---
+# I. Theory part
+## Topic: The "Bridge" Between Devices and Data
+
+### 1. The Big Picture
+
+In IoT, a **Sensor** (like a DHT11) collects data, but it has no "memory" to store thousands of readings. To save this data, it must send it to a **Server** over the internet.
+
+**The Workflow:**
+
+1. **Sensor:** Collects temperature.
+2. **Request:** The device sends the data via an **API**.
+3. **Backend (PHP):** Validates the data and prepares it.
+4. **Database (MySQL):** Stores the data in a table forever.
+
+---
+
+### 2. The Vocabulary of the Web
+
+To build this, you need to understand these three terms:
+
+* **API (Application Programming Interface):** Think of it as a **"Digital Waiter."** You (the device) give the waiter an order; the waiter takes it to the kitchen (the database) and brings back a response.
+* **JSON (JavaScript Object Notation):** The **language** the device and server speak. It is just a simple list of keys and values.
+* *Example:* `{"sensor_id": "Room1", "temp": 22.5}`
+
+
+* **Endpoint:** A specific **URL** where your API lives.
+* *Example:* `http://localhost/my_project/create.php`
+
+
+
+---
+
+### 3. The 4 Golden Rules: CRUD
+
+Every database application does four things. We call this **CRUD**:
+
+| Action | Meaning | HTTP Method | IoT Example |
+| --- | --- | --- | --- |
+| **C**reate | Add new data | **POST** | Sending a new temp reading. |
+| **R**ead | View data | **GET** | Checking the history on a dashboard. |
+| **U**pdate | Edit data | **PUT/POST** | Changing a sensor's name. |
+| **D**elete | Remove data | **DELETE/POST** | Deleting old logs to save space. |
+
+---
+
+### 4. Why Security Matters (SQL Injection)
+
+You never trust the data coming from the internet. A hacker could send a "command" instead of a "temperature" to delete your whole database.
+
+* **The Fix:** We use **Prepared Statements**. Instead of putting data directly into the query, we use a `?` as a placeholder. This tells the database: *"Treat this input only as text, not as a command."*
+
+---
+
+### 💡 Summary for the Lab
+
+* **PHP** is the brain (Logic).
+* **MySQL** is the memory (Storage).
+* **Postman** is our "Fake Sensor" used to test if our brain and memory are working correctly.
+
+---
+
+===
+===
+===
+===
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Practice Part
 # 📖 Instructor's Guide: IoT API Development
 
 ## Module NITIW401: Backend Integration
