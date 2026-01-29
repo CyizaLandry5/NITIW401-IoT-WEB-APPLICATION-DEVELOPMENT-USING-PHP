@@ -220,6 +220,115 @@ $conn->close();
 
 ---
 
+### 🟡 UPDATE Data (`update.php`)
+
+**Purpose:** Allows the system to modify existing sensor records (e.g., correcting an error).
+
+```php
+<?php
+// Include the database connection bridge
+include 'db.php'; 
+
+// Grab the JSON data sent in the request body
+$jsonInput = file_get_contents('php://input');
+$data = json_decode($jsonInput, true);
+
+// 1. Extract the ID and new values from the array
+// We need the 'id' to know exactly which row to change
+$id = $data['id']; 
+$new_temp = $data['temperature'];
+$new_hum = $data['humidity'];
+
+// 2. Prepare the UPDATE command
+// WHERE id = ? is critical! Without it, EVERY row in your database would change.
+$sql = "UPDATE sensor_data SET temperature = ?, humidity = ? WHERE id = ?"; 
+
+$stmt = $conn->prepare($sql);
+
+// 3. Bind parameters: d = double (temp), d = double (humidity), i = integer (id)
+$stmt->bind_param("ddi", $new_temp, $new_hum, $id); 
+
+// 4. Execute and check for success
+if ($stmt->execute()) {
+    echo json_encode(["message" => "Record updated successfully."]); 
+} else {
+    echo json_encode(["error" => "Error updating record: " . $stmt->error]);
+}
+
+// 5. Close resources
+$stmt->close();
+$conn->close();
+?>
+
+```
+
+---
+
+### 🔴 DELETE Data (`delete.php`)
+
+**Purpose:** Removes a specific record from the database using its unique ID.
+
+```php
+<?php
+// Include the database connection bridge
+include 'db.php'; 
+
+// Capture the JSON input containing the ID to be deleted
+$jsonInput = file_get_contents('php://input');
+$data = json_decode($jsonInput, true);
+$id = $data['id'];
+
+// 1. Prepare the DELETE command
+// Again, we use WHERE id = ? to ensure we only delete one specific row
+$sql = "DELETE FROM sensor_data WHERE id = ?"; 
+
+$stmt = $conn->prepare($sql);
+
+// 2. Bind the ID as an integer (i)
+$stmt->bind_param("i", $id); 
+
+// 3. Execute the command
+if ($stmt->execute()) {
+    // Check if a row was actually removed (affected)
+    if ($stmt->affected_rows > 0) {
+        echo json_encode(["message" => "Record deleted successfully."]); 
+    } else {
+        // This happens if the ID provided doesn't exist in the database
+        echo json_encode(["error" => "No record found with that ID."]); 
+    }
+} else {
+    echo json_encode(["error" => "Error deleting record."]);
+}
+
+// 4. Close resources
+$stmt->close();
+$conn->close();
+?>
+
+```
+
+---
+
+## 🛠️ 4. Troubleshooting Guide (For Students)
+
+If your code isn't working, check these common "Gotchas" before asking for help:
+
+| Error Message / Issue | Common Cause | The Fix |
+| --- | --- | --- |
+| **"Connection failed: Access denied..."** | Wrong database password or username. | Check `db.php`. In XAMPP, user is `root` and pass is `''` (empty). |
+| **"404 Not Found" in Postman** | The URL path is typed incorrectly. | Double-check your folder names and file names (e.g., `create.php` vs `Create.php`). |
+| **"500 Internal Server Error"** | There is a syntax error in your PHP code. | Check for missing semicolons `;` or missing curly braces `{}`. |
+| **Empty result `[]` in Read** | The database table is empty. | Run your **Create** test in Postman first to add some data. |
+| **JSON returns "null"** | The data sent in Postman isn't valid JSON. | Ensure your JSON has double quotes `" "` and no trailing commas. |
+
+---
+
+
+
+
+
+---
+
 ## 🧪 3. Student Testing Guide (Postman)
 
 To verify the code is working correctly, students should follow these steps for each "Endpoint."
