@@ -1,86 +1,36 @@
-# 📱 IoT Web Application Development (PHP & MySQL)
+# 📖 Instructor's Guide: IoT API Development
 
-Welcome! This guide is designed for beginners to learn **Module NITIW401** alone. We will build a "Backend API" that allows IoT devices (like sensors) to talk to a database.
+## Module NITIW401: Backend Integration
 
-**Prerequisites:**
-
-1. **XAMPP/WAMP:** To run the server and database.
-
-
-2. **Postman:** To test if your code works.
-
-
+This document contains the fully commented source code and testing procedures for students.
 
 ---
 
-## 📚 1. The Theory
+## 🛠 1. Database Connection (`db.php`)
 
-* **API (Application Programming Interface):** Think of this as a "Waiter." The IoT device (Customer) orders food, the API (Waiter) tells the Kitchen (Database), and then brings the food back.
-* ** In IOT Web App Development, API is a set of rules, protocols, and tools that allows connected devices (sensors, actuators) to communicate with a PHP backend server, exchange data, and receive commands. It acts as a middleman that ensures data is exchanged in a standardized format, usually JSON or XML, between IoT devices and the web application. 
-
-<img width="420" height="auto" alt="image" src="https://github.com/user-attachments/assets/ce6eb905-20cb-4858-a54f-9101a1bb8924" />
-
-* **Endpoint:** A specific URL (link) where the API listens for orders, like `http://localhost/api/create.php`.
-
-
-* **JSON:** The language they speak. It is lightweight and easy for machines to read.
-* 
-**Definition:** JSON (JavaScript Object Notation) is a lightweight, text-based, and human-readable format for storing and exchanging data, consisting primarily of key-value pairs. 
-**Role in PHP IoT Web App:** It acts as the standard, lightweight language for transmitting sensor data between IoT devices (via MQTT or HTTP) and the PHP web backend, which parses it using json_encode() and json_decode() to display or store information. 
-
-* *Example:* `{"sensor_id": "S1", "temp": 25.5}`
-
-
-
----
-
-## 🛠️ 2. Step-by-Step Setup
-
-### Step A: Create the Database
-
-Before writing code, we need a place to store data.
-
-1. Open **phpMyAdmin**.
-2. Run this SQL code to create your database and table.
-
-
-
-```sql
-CREATE DATABASE iot_database;
-
-USE iot_database;
-
-CREATE TABLE sensor_data (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    sensor_id VARCHAR(50) NOT NULL,
-    temperature FLOAT,
-    humidity FLOAT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-```
-
-### Step B: The Connection File (`db.php`)
-
-This file opens the door to the database. We will include this file in all other scripts.
-
-**File Name:** `db.php`
+**Purpose:** To establish a secure link between the PHP script and the MySQL database.
 
 ```php
 <?php
-// Database credentials
-$host = 'localhost';
-$user = 'root';      [cite_start]// Default XAMPP user [cite: 113]
-$pass = '';          [cite_start]// Default XAMPP password is empty [cite: 114]
-$db   = 'iot_database';
+// Define the address of the database server (usually localhost for XAMPP)
+$host = 'localhost'; 
 
-// Create a connection using MySQLi (Simple Style)
-$conn = new mysqli($host, $user, $pass, $db); [cite_start]// [cite: 114]
+// The default username for XAMPP MySQL is 'root'
+$user = 'root'; 
 
-// Check if the door opened successfully
+// The default password for XAMPP is empty/blank
+$pass = ''; 
+
+// The name of the database we created in phpMyAdmin
+$db   = 'iot_database'; 
+
+// Create a new connection object using the MySQLi library
+$conn = new mysqli($host, $user, $pass, $db); 
+
+// Check if the connection failed
 if ($conn->connect_error) {
-    // If it failed, stop everything and show the error
-    die("Connection failed: " . $conn->connect_error); [cite_start]// [cite: 115]
+    // If there is an error, stop the script and display the message
+    die("Connection failed: " . $conn->connect_error); 
 }
 ?>
 
@@ -88,57 +38,56 @@ if ($conn->connect_error) {
 
 ---
 
-## 🚀 3. Coding the CRUD Operations
+## 🚀 2. CRUD Operations
 
-**CRUD** = **C**reate, **R**ead, **U**pdate, **D**elete.
+### 🟢 CREATE Data (`create.php`)
 
-### 🟢 1. CREATE (Register/Insert Data)
-
-**Goal:** The sensor sends JSON data, and we save it.
-
-**File Name:** `create.php`
+**Purpose:** Allows the IoT device to send sensor readings to the database.
 
 ```php
 <?php
-// 1. Connect to the database
-include 'db.php'; [cite_start]// [cite: 117]
+// Include the database connection settings from db.php
+include 'db.php'; 
 
-// 2. Receive the raw JSON data from the IoT device (or Postman)
-$jsonInput = file_get_contents('php://input'); [cite_start]// [cite: 67]
-$data = json_decode($jsonInput, true); [cite_start]// Convert JSON to PHP array [cite: 68]
+// Get the raw text (JSON) sent by the device/Postman
+$jsonInput = file_get_contents('php://input'); 
 
-// 3. Validation: Check if the data is actually there
+// Convert the JSON text into a PHP 'Array' so we can work with it
+$data = json_decode($jsonInput, true); 
+
+// Validation: Check if the required fields (sensor_id and temperature) exist
 if (!isset($data['sensor_id']) || !isset($data['temperature'])) {
-    [cite_start]// Send a 400 Bad Request error if data is missing [cite: 70]
+    // If data is missing, tell the device it made a 'Bad Request' (Error 400)
     http_response_code(400);
-    echo json_encode(["error" => "Invalid data. Missing ID or Temp."]); [cite_start]// [cite: 71]
-    exit;
+    echo json_encode(["error" => "Invalid data. Missing ID or Temp."]); 
+    exit; // Stop the script here
 }
 
-// 4. Assign variables
+// Assign the data from the array to simple variables
 $sensor_id = $data['sensor_id'];
 $temperature = $data['temperature'];
 $humidity = $data['humidity'];
 
-// 5. Prepare the SQL (Security measure against hackers)
-[cite_start]// We use '?' placeholders instead of putting variables directly in the query [cite: 119]
+// Prepare an SQL statement with '?' placeholders to prevent SQL Injection (hacking)
 $sql = "INSERT INTO sensor_data (sensor_id, temperature, humidity) VALUES (?, ?, ?)";
 
-$stmt = $conn->prepare($sql); [cite_start]// [cite: 120]
+// Tell the database to prepare for this specific query structure
+$stmt = $conn->prepare($sql); 
 
-// 6. Bind Parameters (Connect variables to the '?')
-// "sdd" means: String (sensor_id), Double (temp), Double (humidity)
-$stmt->bind_param("sdd", $sensor_id, $temperature, $humidity); [cite_start]// [cite: 120]
+// Bind the actual data to the '?' placeholders
+// "sdd" means: s = string, d = double (decimal), d = double
+$stmt->bind_param("sdd", $sensor_id, $temperature, $humidity); 
 
-// 7. Execute and Reply
+// Run the query and check if it was successful
 if ($stmt->execute()) {
-    // Success! [cite_start]Tell the device we saved it [cite: 121]
+    // Send a success message back to the device in JSON format
     echo json_encode(["message" => "Data inserted successfully."]);
 } else {
-    echo json_encode(["error" => "Error: " . $stmt->error]); [cite_start]// [cite: 122]
+    // If something went wrong, send the error message
+    echo json_encode(["error" => "Error: " . $stmt->error]); 
 }
 
-// 8. Clean up
+// Close the statement and the database connection to save server resources
 $stmt->close();
 $conn->close();
 ?>
@@ -147,37 +96,40 @@ $conn->close();
 
 ---
 
-### 🔵 2. READ (Get Data)
+### 🔵 READ Data (`read.php`)
 
-**Goal:** The user wants to see the sensor history.
-
-**File Name:** `read.php`
+**Purpose:** Retrieves all stored sensor data for display.
 
 ```php
 <?php
-include 'db.php'; [cite_start]// [cite: 175]
+// Include the connection file
+include 'db.php'; 
 
-// 1. Write the query to get all data, newest first
-$sql = "SELECT * FROM sensor_data ORDER BY created_at DESC"; [cite_start]// [cite: 176]
+// Create the SQL command to select everything and sort by the latest date
+$sql = "SELECT * FROM sensor_data ORDER BY created_at DESC"; 
 
-// 2. Run the query
-$result = $conn->query($sql); [cite_start]// [cite: 177]
+// Execute the query and store the result in a variable
+$result = $conn->query($sql); 
 
-// 3. Check if we found anything
+// Check if the database actually returned any rows
 if ($result->num_rows > 0) {
-    $rows = array(); // Create an empty list
+    // Create an empty list (array) to store the data
+    $rows = array(); 
     
-    // Loop through the database results one by one
+    // Fetch each row one by one as an associative array
     while ($row = $result->fetch_assoc()) {
-        $rows[] = $row; [cite_start]// Add each row to our list [cite: 178]
+        // Add the current row to our list
+        $rows[] = $row; 
     }
     
-    // Send the list back as JSON
+    // Convert the entire list of rows into a JSON string for the user to see
     echo json_encode($rows);
 } else {
-    echo json_encode(["message" => "No data found."]); [cite_start]// [cite: 181]
+    // If the table is empty, send a 'No data' message
+    echo json_encode(["message" => "No data found."]); 
 }
 
+// Close the connection
 $conn->close();
 ?>
 
@@ -185,139 +137,57 @@ $conn->close();
 
 ---
 
-### 🟡 3. UPDATE (Edit Data)
+## 🧪 3. Student Testing Guide (Postman)
 
-**Goal:** Correct a mistake or update settings.
+To verify the code is working correctly, students should follow these steps for each "Endpoint."
 
-**File Name:** `update.php`
+### **Test A: The CREATE Endpoint**
 
-```php
-<?php
-include 'db.php'; [cite_start]// [cite: 254]
+1. **Method:** `POST`
+2. **URL:** `http://localhost/api/create.php`
+3. **Body:** Select **raw** and set type to **JSON**.
+4. **Data to send:**
 
-// 1. Get the JSON data
-$jsonInput = file_get_contents('php://input');
-$data = json_decode($jsonInput, true);
-
-// 2. We need the ID of the row to update
-$id = $data['id']; 
-$new_temp = $data['temperature'];
-$new_hum = $data['humidity'];
-
-// 3. Prepare the Update Query
-$sql = "UPDATE sensor_data SET temperature = ?, humidity = ? WHERE id = ?"; [cite_start]// [cite: 256]
-
-$stmt = $conn->prepare($sql);
-
-// 4. Bind: Double, Double, Integer (ddi)
-$stmt->bind_param("ddi", $new_temp, $new_hum, $id); [cite_start]// [cite: 257]
-
-// 5. Execute
-if ($stmt->execute()) {
-    echo json_encode(["message" => "Record updated successfully."]); [cite_start]// [cite: 258]
-} else {
-    echo json_encode(["error" => "Error updating record: " . $stmt->error]);
-}
-
-$stmt->close();
-$conn->close();
-?>
-
-```
-
----
-
-### 🔴 4. DELETE (Remove Data)
-
-**Goal:** Remove old or bad data.
-
-**File Name:** `delete.php`
-
-```php
-<?php
-include 'db.php'; [cite_start]// [cite: 307]
-
-// 1. Get the ID to delete from the request
-$jsonInput = file_get_contents('php://input');
-$data = json_decode($jsonInput, true);
-$id = $data['id'];
-
-// 2. Prepare Delete Query
-$sql = "DELETE FROM sensor_data WHERE id = ?"; [cite_start]// [cite: 309]
-
-$stmt = $conn->prepare($sql);
-
-// 3. Bind: Integer (i)
-$stmt->bind_param("i", $id); [cite_start]// [cite: 310]
-
-// 4. Execute and Check
-if ($stmt->execute()) {
-    // Check if any row was actually deleted
-    if ($stmt->affected_rows > 0) {
-        echo json_encode(["message" => "Record deleted successfully."]); [cite_start]// [cite: 311]
-    } else {
-        echo json_encode(["error" => "No record found with that ID."]); [cite_start]// [cite: 312]
-    }
-} else {
-    echo json_encode(["error" => "Error deleting record."]);
-}
-
-$stmt->close();
-$conn->close();
-?>
-
-```
-
----
-
-## 🛡️ 4. Security (Best Practices)
-
-To keep your application safe, always remember these three rules:
-
-1. **Use HTTPS:** Encrypts data so no one can steal passwords.
-
-
-2. **Input Validation:** Never trust what the user sends. Always check if the data exists before using it (like we did in `create.php`).
-
-
-3. **Prepared Statements:** Always use `bind_param` and `?`. This prevents **SQL Injection** hackers from destroying your database.
-
-
-
----
-
-## 🧪 5. How to Test (Using Postman)
-
-You don't need a real sensor yet! Use **Postman** to pretend to be a device.
-
-**To Test CREATE:**
-
-1. Open Postman.
-2. Set method to **POST**.
-3. URL: `http://localhost/your_folder/create.php`
-4. Go to **Body** -> **Raw** -> Select **JSON**.
-5. Write this:
 ```json
 {
-    "sensor_id": "Sensor_01",
-    "temperature": 28.5,
-    "humidity": 60.0
+    "sensor_id": "Lab_Sensor_01",
+    "temperature": 24.5,
+    "humidity": 55.0
 }
 
 ```
 
+### **Test B: The READ Endpoint**
 
-6. Click **Send**. You should see "Data inserted successfully."
+1. **Method:** `GET`
+2. **URL:** `http://localhost/api/read.php`
+3. **Body:** None (Keep it empty).
+4. **Expected Result:** You should see the JSON data you just "Created" in Test A.
 
----
+### **Test C: The UPDATE Endpoint**
 
-## 📝 Practice Challenges 
+1. **Method:** `POST`
+2. **URL:** `http://localhost/api/update.php`
+3. **Data to send (Change ID to match a real row):**
 
-1. **Modify `read.php`:** Change the SQL query to only show sensors where `temperature > 30` 
-(Hint: Use `WHERE` clause).
+```json
+{
+    "id": 1,
+    "temperature": 99.9,
+    "humidity": 10.0
+}
 
+```
 
-2. **Secure the Delete:** Add an `if` check in `delete.php` to make sure the `$id` is not empty before running the query.
+### **Test D: The DELETE Endpoint**
 
+1. **Method:** `POST`
+2. **URL:** `http://localhost/api/delete.php`
+3. **Data to send:**
 
-3. **Authentication:** Create a simple check so that you only allow requests if they send a specific "API Key" in the JSON?.
+```json
+{
+    "id": 1
+}
+
+```
