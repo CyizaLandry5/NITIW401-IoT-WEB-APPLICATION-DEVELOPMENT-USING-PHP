@@ -1,6 +1,6 @@
 
 ---
-# I. Theory part
+# I. The Theory part
 ## Topic: The "Bridge" Between Devices and Data
 
 ### 1. The Big Picture
